@@ -8,16 +8,8 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'test-s3-presigned-upload';
-  customerId = 'tide-broker'
+  api = 'http://tide-broker-admin.localdev.tcpci.com:5000/api/Branding/logo/presignedUrl'
 
-  // controller = 'BannerUpload';
-  // fileType = 'banner';
-
-  controller = 'LogoUpload';
-  fileType = 'logo';
-
-  api = `http://localhost:5010/api/v1/${this.controller}`;
   url: string | undefined
   file: File | undefined;
 
@@ -38,7 +30,7 @@ export class AppComponent {
       params: { extension: `.${extension}` },
       responseType: 'text' as 'json'
     }
-    const result = await firstValueFrom(this._http.get<string>(`${this.api}/customer/${this.customerId}/presignedUrl`, options));
+    const result = await firstValueFrom(this._http.get<string>(this.api, options));
     console.log({ result });
     this.url = result;
   }
@@ -52,11 +44,13 @@ export class AppComponent {
     const extension = this.file.type.split("/").pop();
 
     // not sure why this is required, but will fail 403 without renaming the file
-    const myFile = new File([this.file], `${this.fileType}.${extension}`);
+    const myFile = new File([this.file], `logo.${extension}`);
 
     await firstValueFrom(this._http.put(this.url, myFile));
-    await firstValueFrom(
-      this._http.post<string>(`${this.api}/customer/${this.customerId}/publishStaged`, null)
-    )
+    // not implemented
+    console.log('cant publish not implemented')
+    // await firstValueFrom(
+    //   this._http.post<string>(`${this.api}/customer/${this.customerId}/publishStaged`, null)
+    // )
   }
 }
